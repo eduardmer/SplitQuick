@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">SplitQuick</string>
+
+    <string name="create_account">Create \nan \naccount</string>
+    <string name="email_not_valid">Please, enter a valid email address.</string>
+    <string name="name_not_valid">Please, enter a valid first name and last name.</string>
+
+    <string name="groups">Groups</string>
+    <string name="activity">Activity</string>
+    <string name="settings">Settings</string>
+    <string name="add_expense">Add expense</string>
+    <string name="total_expenses">%.2f expenses</string>
+    <string name="no_expenses">no expenses</string>
+
+    <string name="group_name">Group name</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="email">Email</string>
+    <string name="next">Next</string>
+    <string name="group_members_not_valid">Please, enter a valid name for your group and members.</string>
+
+    <string name="create_group">Create a group</string>
+    <string name="add_new_member">Add new member</string>
+    <string name="delete_member">Delete member</string>
+    <string name="done">Done</string>
+
+    <string name="search">Search</string>
+    <string name="add_group">Add new group</string>
+    <string name="welcome">Welcome to SplitQuick, %s</string>
+    <string name="no_groups_text">SplitQuick groups you create or are added to will show here.</string>
+    <string name="start_new_group">Start a new group</string>
+
+    <string name="no_activity">There is no activity in your account yet. Try adding an expense!</string>
+
+    <string name="enter_description">Enter a description</string>
+    <string name="amount">Amount</string>
+    <string name="paid_by">Paid by </string>
+    <string name="you">you</string>
+    <string name="split_equally"> and split equally</string>
+    <string name="select_member">--Select a member--</string>
+    <string name="someone_paid">%s paid %.2f</string>
+    <string name="add_expenses_not_valid">Please, fill in all fields.</string>
+
+    <string name="group_members">Group members</string>
+    <string name="history">History</string>
+
+    <!-- events type -->
+    <string name="created_group"><![CDATA[<b>You</b>]]> created the group <![CDATA[<b>\"%s\"</b>]]></string>
+    <string name="added_member"><![CDATA[<b>You</b>]]> added %s to the group <![CDATA[<b>\"%s\"</b>]]></string>
+    <string name="added_expense">%s added <![CDATA[<b>\"%s\"</b>]]> in <![CDATA[<b>\"%s\"</b>]]></string>
+</resources>
