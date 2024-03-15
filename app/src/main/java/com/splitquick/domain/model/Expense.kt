@@ -1,5 +1,7 @@
 package com.splitquick.domain.model
 
+import java.math.BigDecimal
+
 data class Expense(
     val id: Long = 0,
     val contributorId: Long,
@@ -7,6 +9,7 @@ data class Expense(
     val groupId: Long,
     val groupName: String,
     val description: String,
-    val amount: Double,
+    val amount: BigDecimal,
+    val currency: Currency,
     val date: Long
 )

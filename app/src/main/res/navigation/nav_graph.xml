@@ -46,4 +46,8 @@
             app:argType="long"
             />
     </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.splitquick.ui.SettingsFragment"
+        android:label="SettingsFragment" />
 </navigation>

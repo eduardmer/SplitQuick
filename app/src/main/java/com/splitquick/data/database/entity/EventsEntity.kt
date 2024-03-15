@@ -3,6 +3,7 @@ package com.splitquick.data.database.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.splitquick.domain.model.EventType
+import java.math.BigDecimal
 
 @Entity
 data class EventsEntity(
@@ -11,7 +12,7 @@ data class EventsEntity(
     val memberName: String,
     val groupName: String,
     val expenseDescription: String = "",
-    val amount: Double = 0.0,
+    val amount: BigDecimal = BigDecimal.ZERO,
     val action: EventType,
     val date: Long
 )

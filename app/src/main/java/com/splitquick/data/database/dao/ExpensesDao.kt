@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import com.splitquick.data.database.entity.ExpensesEntity
 import kotlinx.coroutines.flow.Flow
+import java.math.BigDecimal
 
 @Dao
 interface ExpensesDao {
@@ -13,7 +14,7 @@ interface ExpensesDao {
     fun getAllExpensesForGroup(groupId: Long): Flow<List<ExpensesEntity>>
 
     @Query("SELECT SUM(amount) AS value FROM ExpensesEntity WHERE groupId = :groupId")
-    suspend fun getTotalExpensesForGroup(groupId: Long): Double?
+    suspend fun getTotalExpensesForGroup(groupId: Long): BigDecimal?
 
     @Insert
     suspend fun addExpense(expense: ExpensesEntity)

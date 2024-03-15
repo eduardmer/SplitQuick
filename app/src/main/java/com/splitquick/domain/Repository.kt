@@ -6,10 +6,13 @@ import com.splitquick.domain.model.Group
 import com.splitquick.domain.model.Member
 import com.splitquick.domain.model.Payment
 import com.splitquick.domain.model.Result
+import com.splitquick.domain.model.Settings
 import com.splitquick.domain.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface Repository {
+
+    val isDarkModeEnabled: Flow<Boolean>
 
     val user: Flow<User>
 
@@ -30,5 +33,11 @@ interface Repository {
     fun getAllExpensesForGroup(groupId: Long): Flow<List<Expense>>
 
     fun getCalculations(groupId: Long): Flow<List<Payment>>
+
+    val settings: Flow<Settings>
+
+    suspend fun enableDarkMode(isDarkModeEnabled: Boolean)
+
+    suspend fun setLanguage(language: String)
 
 }

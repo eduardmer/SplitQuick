@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import com.splitquick.UserPreferences
 import com.splitquick.data.database.AppDatabase
@@ -32,6 +35,14 @@ object AppModule {
         return DataStoreFactory.create(serializer = userPreferencesSerializer) {
             context.dataStoreFile("user_preferences.proto")
         }
+    }
+
+    @Provides
+    @Singleton
+    fun providePreferencesDataSource(@ApplicationContext context: Context): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create(produceFile = {
+            context.preferencesDataStoreFile("app_preferences")
+        })
     }
 
     @Provides

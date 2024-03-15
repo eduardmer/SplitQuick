@@ -12,10 +12,13 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.splitquick.R
 import com.splitquick.databinding.FragmentCreateGroupBinding
+import com.splitquick.domain.model.Currency
 import com.splitquick.domain.model.Group
 import com.splitquick.domain.model.Member
 import com.splitquick.domain.model.Result
 import com.splitquick.ui.adapter.AddMemberAdapter
+import com.splitquick.ui.adapter.CurrencyAdapter
+import com.splitquick.ui.model.UiState
 import com.splitquick.utils.content
 import com.splitquick.utils.isEmpty
 import com.splitquick.utils.launchAndRepeatWithLifecycle
@@ -27,6 +30,7 @@ class CreateGroupFragment : Fragment() {
 
     private lateinit var binding: FragmentCreateGroupBinding
     private val viewModel: SharedViewModel by viewModels()
+    private var selectedCurrency: Currency? = null
     private val members = mutableListOf(Member(), Member())
     private var job: Job? = null
 
@@ -38,42 +42,47 @@ class CreateGroupFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val membersAdapter = AddMemberAdapter(members)
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-            adapter = membersAdapter
-        }
-        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
-            if (menuItem.itemId == R.id.done) {
+        val currencyAdapter = CurrencyAdapter(requireContext(), Currency.values().asList())
+        binding.apply {
+            currencyText.setAdapter(currencyAdapter)
+            recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            recyclerView.adapter = membersAdapter
+            currencyText.setOnItemClickListener { _, _, position, _ ->
+                selectedCurrency = currencyAdapter.getItem(position)
+            }
+            topAppBar.setOnMenuItemClickListener {
                 job?.cancel()
                 if (
                     binding.fullNameText.isEmpty() ||
+                    selectedCurrency == null ||
                     members.any { it.firstName.trim().isEmpty() || it.lastName.trim().isEmpty() }
                 )
-                    Toast.makeText(requireContext(), R.string.group_members_not_valid, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), R.string.add_expenses_not_valid, Toast.LENGTH_SHORT).show()
                 else
                     job = launchAndRepeatWithLifecycle {
                         viewModel.addGroup(
                             Group(
-                                name = binding.fullNameText.content(),
+                                name = fullNameText.content(),
+                                currency = selectedCurrency!!,
                                 date = System.currentTimeMillis()
                             ),
                             members
                         ).collect { result ->
                             when(result) {
-                                Result.Success -> {
+                                is UiState.Success<*> -> {
                                     showProgressBar(false)
                                     findNavController().navigateUp()
                                 }
-                                is Result.Error -> {
+                                is UiState.Error -> {
                                     showProgressBar(false)
                                     Toast.makeText(requireContext(), result.error, Toast.LENGTH_SHORT).show()
                                 }
-                                Result.Loading -> showProgressBar(true)
+                                UiState.Loading -> showProgressBar(true)
                             }
                         }
                     }
+                false
             }
-            false
         }
     }
 

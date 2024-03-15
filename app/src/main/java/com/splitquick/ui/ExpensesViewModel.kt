@@ -28,18 +28,19 @@ class ExpensesViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
-    private val selectedGroup = MutableStateFlow(-1L)
+    private val selectedGroup = MutableStateFlow(Group(id = -1))
 
     private val _uiState = MutableStateFlow(ExpensesUiState(isLoading = true))
     val uiState = combine(
         repository.getGroupsByName(""),
         selectedGroup.flatMapLatest {
-            repository.getMembersByGroup(it)
+            repository.getMembersByGroup(it.id)
         },
         _uiState
     ) { groups, members, state ->
         state.copy(
             groups = groups,
+            selectedGroup = selectedGroup.value,
             members = members,
             isLoading = false
         )
@@ -56,18 +57,18 @@ class ExpensesViewModel @Inject constructor(
             val items = mutableListOf<Payments>()
             items.add(Payments(type = ItemType.TITLE, title = R.string.group_members))
             items.addAll(calculations.map {
-                Payments(type = ItemType.CALCULATION, contributorName = it.giverName, calculation = it.amount)
+                Payments(type = ItemType.CALCULATION, contributorName = it.giverName, calculation = it.amount, currency = it.currency)
             })
             items.add(Payments(type = ItemType.TITLE, R.string.history))
             items.addAll(payments.map {
-                Payments(type = ItemType.HISTORY, contributorName = it.contributorName, description = it.description, contributedAmount = it.amount)
+                Payments(type = ItemType.HISTORY, contributorName = it.contributorName, description = it.description, contributedAmount = it.amount, currency = it.currency)
             })
             items
         }
     }
 
-    fun selectGroup(groupId: Long) {
-        selectedGroup.value = groupId
+    fun selectGroup(group: Group) {
+        selectedGroup.value = group
     }
 
     fun addExpense(expense: Expense) {
@@ -90,6 +91,7 @@ class ExpensesViewModel @Inject constructor(
 
 data class ExpensesUiState(
     val groups: List<Group> = emptyList(),
+    val selectedGroup: Group = Group(id = -1),
     val members: List<Member> = emptyList(),
     val error: String? = null,
     val isLoading: Boolean = false,

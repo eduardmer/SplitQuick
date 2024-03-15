@@ -1,6 +1,7 @@
 package com.splitquick.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -12,10 +13,13 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.splitquick.R
 import com.splitquick.databinding.FragmentCreateProfileBinding
+import com.splitquick.domain.model.User
+import com.splitquick.ui.model.UiState
 import com.splitquick.utils.content
 import com.splitquick.utils.isEmpty
 import com.splitquick.utils.launchAndRepeatWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 
 @AndroidEntryPoint
 class CreateProfileFragment : Fragment() {
@@ -31,9 +35,15 @@ class CreateProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         launchAndRepeatWithLifecycle {
-            viewModel.user.collect { user ->
-                if (!user.isEmpty())
-                    findNavController().navigate(CreateProfileFragmentDirections.actionCreateProfileFragmentToGroupsFragment())
+            viewModel.user.collectLatest { uiState ->
+                when(uiState) {
+                    is UiState.Success<*> -> {
+                        if (!(uiState.data as User).isEmpty())
+                            findNavController().navigate(CreateProfileFragmentDirections.actionCreateProfileFragmentToGroupsFragment())
+                    }
+                    is UiState.Error -> Toast.makeText(requireContext(), uiState.error, Toast.LENGTH_SHORT).show()
+                    UiState.Loading -> Log.i("CreateProfileLog", "loading")
+                }
             }
         }
         binding.apply {

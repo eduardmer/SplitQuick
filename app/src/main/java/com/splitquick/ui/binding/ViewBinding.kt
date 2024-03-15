@@ -6,8 +6,11 @@ import androidx.databinding.BindingAdapter
 import androidx.navigation.findNavController
 import com.google.android.material.appbar.MaterialToolbar
 import com.splitquick.R
+import com.splitquick.domain.model.Currency
 import com.splitquick.domain.model.Event
 import com.splitquick.domain.model.EventType
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -16,11 +19,11 @@ fun TextView.setInitialsAsIcon(name: String) {
     text = name.substring(0..1)
 }
 
-@BindingAdapter("total_expenses")
-fun TextView.setTotalExpenses(value: Double) {
-    text = if (value == 0.0)
+@BindingAdapter("expenses", "currency")
+fun TextView.setTotalExpenses(value: BigDecimal, currency: Currency) {
+    text = if (value == BigDecimal.ZERO)
         context.getString(R.string.no_expenses)
-    else context.getString(R.string.total_expenses, value)
+    else context.getString(R.string.total_expenses, "${value.setScale(currency.roundingFactor, RoundingMode.HALF_UP)} ${currency.symbol}")
 }
 
 @BindingAdapter("htmlText")

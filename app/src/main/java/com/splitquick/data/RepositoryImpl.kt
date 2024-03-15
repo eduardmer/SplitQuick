@@ -1,5 +1,6 @@
 package com.splitquick.data
 
+import com.splitquick.BuildConfig
 import com.splitquick.data.database.dao.ActivityDao
 import com.splitquick.data.database.dao.ExpensesDao
 import com.splitquick.data.database.dao.GroupsDao
@@ -7,29 +8,38 @@ import com.splitquick.data.database.dao.MembersDao
 import com.splitquick.data.database.mapper.generateEvent
 import com.splitquick.data.database.mapper.toDataModel
 import com.splitquick.data.database.mapper.toDomainModel
+import com.splitquick.data.datastore.PreferencesDataSource
 import com.splitquick.data.datastore.ProtoDataSource
 import com.splitquick.data.datastore.mapper.toDomainModel
 import com.splitquick.domain.Repository
+import com.splitquick.domain.model.Currency
 import com.splitquick.domain.model.Event
 import com.splitquick.domain.model.Expense
 import com.splitquick.domain.model.Group
 import com.splitquick.domain.model.Member
 import com.splitquick.domain.model.Payment
+import com.splitquick.domain.model.Settings
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.zip
+import java.math.BigDecimal
+import java.math.MathContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class RepositoryImpl @Inject constructor(
+    private val preferencesDataSource: PreferencesDataSource,
     private val protoDataSource: ProtoDataSource,
     private val groupsDao: GroupsDao,
     private val membersDao: MembersDao,
     private val activityDao: ActivityDao,
     private val expensesDao: ExpensesDao
 ) : Repository {
+
+    override val isDarkModeEnabled: Flow<Boolean> = preferencesDataSource.isDarkModeEnabled
 
     override val user = protoDataSource.user.map {
         it.toDomainModel()
@@ -38,7 +48,7 @@ class RepositoryImpl @Inject constructor(
     override fun getGroupsByNameWithExpenses(group: String): Flow<List<Group>> {
         return groupsDao.getGroupsByName(group).map { items ->
             items.map {
-                it.toDomainModel(expensesDao.getTotalExpensesForGroup(it.id) ?: 0.0)
+                it.toDomainModel(expensesDao.getTotalExpensesForGroup(it.id) ?: BigDecimal.ZERO)
             }
         }
     }
@@ -100,13 +110,30 @@ class RepositoryImpl @Inject constructor(
     }
 
     override fun getCalculations(groupId: Long) = membersDao.getMembersByGroup(groupId).zip(expensesDao.getAllExpensesForGroup(groupId)) { members, expenses ->
-        val average = expenses.sumOf { it.amount }/members.size
+        val currency = expenses.firstOrNull()?.currency ?: Currency.EUR
+        val average = expenses.sumOf { it.amount }.divide(members.size.toBigDecimal(), MathContext.DECIMAL32)
         val items = mutableListOf<Payment>()
         members.forEach { member ->
             val allExpensesForMember = expenses.filter { it.contributorId == member.id }.sumOf { it.amount }
-            items.add(Payment(member.id, "${member.firstName} ${member.lastName}", allExpensesForMember - average))
+            items.add(Payment(member.id, "${member.firstName} ${member.lastName}", allExpensesForMember.minus(average), currency))
         }
         items
+    }
+
+    override val settings: Flow<Settings> = combine(
+        protoDataSource.user,
+        preferencesDataSource.isDarkModeEnabled,
+        preferencesDataSource.language
+    ) { user, isDarkModeEnabled, language ->
+        Settings("${user.firstName} ${user.lastName}", user.email, isDarkModeEnabled, language, "v${BuildConfig.VERSION_NAME}/${BuildConfig.VERSION_CODE}")
+    }
+
+    override suspend fun enableDarkMode(isDarkModeEnabled: Boolean) {
+        preferencesDataSource.setDarkMode(isDarkModeEnabled)
+    }
+
+    override suspend fun setLanguage(language: String) {
+        preferencesDataSource.setLanguage(language)
     }
 
 }

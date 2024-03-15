@@ -10,6 +10,7 @@ fun Expense.toDataModel() = ExpensesEntity(
     groupName = groupName,
     description = description,
     amount = amount,
+    currency = currency,
     date = date
 )
 
@@ -21,5 +22,6 @@ fun ExpensesEntity.toDomainModel() = Expense(
     groupName = groupName,
     description = description,
     amount = amount,
+    currency = currency,
     date = date
 )

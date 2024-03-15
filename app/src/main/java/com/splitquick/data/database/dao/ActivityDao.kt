@@ -12,11 +12,11 @@ interface ActivityDao {
     @Query("SELECT * FROM EventsEntity ORDER BY date DESC")
     fun getAllActivities(): Flow<List<EventsEntity>>
 
-    @Query("SELECT * FROM EventsEntity WHERE " +
+    @Query("SELECT * FROM EventsEntity WHERE (" +
             "memberName LIKE '%' || :filter || '%' OR " +
             "groupName LIKE '%' || :filter || '%' OR " +
             "expenseDescription LIKE '%' || :filter || '%'" +
-            "ORDER BY date DESC")
+            ") ORDER BY date DESC")
     fun filterEvents(filter: String): Flow<List<EventsEntity>>
 
     @Insert

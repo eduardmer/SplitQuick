@@ -14,8 +14,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.splitquick.R
 import com.splitquick.databinding.FragmentGroupsBinding
 import com.splitquick.ui.adapter.GroupsAdapter
+import com.splitquick.ui.model.GroupsScreenData
+import com.splitquick.ui.model.UiState
+import com.splitquick.utils.filterData
 import com.splitquick.utils.launchAndRepeatWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 
 @AndroidEntryPoint
 class GroupsFragment : Fragment() {
@@ -35,16 +39,23 @@ class GroupsFragment : Fragment() {
         }, {
             findNavController().navigate(GroupsFragmentDirections.actionGroupsFragmentToCalculationsFragment(it))
         })
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-            this.adapter = adapter
+        binding.apply {
+            recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            recyclerView.adapter = adapter
+            (topAppBar.menu.findItem(R.id.search).actionView as SearchView).filterData { groupName ->
+                viewModel.searchGroup(groupName)
+            }
+            startGroup.setOnClickListener {
+                findNavController().navigate(GroupsFragmentDirections.actionGroupsFragmentToCreateGroupFragment())
+            }
         }
         launchAndRepeatWithLifecycle {
-            viewModel.groupsUiState.collect { uiState ->
+            viewModel.groupsUiState.collectLatest { uiState ->
                 when(uiState) {
-                    is GroupsUiState.Success -> {
-                        binding.welcomeText.text = getString(R.string.welcome, uiState.user.firstName)
-                        if (uiState.groups.isEmpty()) {
+                    is UiState.Success<*> -> {
+                        val data = uiState.data as GroupsScreenData
+                        binding.welcomeText.text = getString(R.string.welcome, data.user.firstName)
+                        if (data.groups.isEmpty()) {
                             binding.noGroupText.visibility = View.VISIBLE
                             binding.startGroup.visibility = View.VISIBLE
                             binding.recyclerView.visibility = View.GONE
@@ -53,30 +64,16 @@ class GroupsFragment : Fragment() {
                             binding.startGroup.visibility = View.GONE
                             binding.recyclerView.visibility = View.VISIBLE
                         }
-                        adapter.submitList(uiState.groups)
+                        adapter.submitList(uiState.data.groups)
                         showProgressBar(false)
                     }
-                    is GroupsUiState.Error -> {
+                    is UiState.Error -> {
                         Toast.makeText(requireContext(), uiState.error, Toast.LENGTH_SHORT).show()
                         showProgressBar(false)
                     }
-                    GroupsUiState.Loading -> showProgressBar(true)
+                    UiState.Loading -> showProgressBar(true)
                 }
             }
-        }
-        (binding.topAppBar.menu.findItem(R.id.search).actionView as SearchView).setOnQueryTextListener(object :
-            SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                viewModel.searchGroup(newText ?: "")
-                return false
-            }
-        })
-        binding.startGroup.setOnClickListener {
-            findNavController().navigate(GroupsFragmentDirections.actionGroupsFragmentToCreateGroupFragment())
         }
     }
 
