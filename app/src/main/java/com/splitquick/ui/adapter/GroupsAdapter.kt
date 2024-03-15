@@ -5,11 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.splitquick.databinding.ViewAddGroupBinding
+import com.splitquick.databinding.ViewAddGroupButtonBinding
 import com.splitquick.databinding.ViewGroupBinding
 import com.splitquick.domain.model.Group
 import com.splitquick.ui.view_holder.GroupViewHolder
-import com.splitquick.ui.view_holder.AddGroupViewHolder
+import com.splitquick.ui.view_holder.AddGroupButtonViewHolder
 
 class GroupsAdapter(
     private val onButtonClick: () -> Unit,
@@ -29,13 +29,13 @@ class GroupsAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return if (viewType == BUTTON)
-            AddGroupViewHolder(ViewAddGroupBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+            AddGroupButtonViewHolder(ViewAddGroupButtonBinding.inflate(LayoutInflater.from(parent.context), parent, false))
         else
             GroupViewHolder(ViewGroupBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (holder is AddGroupViewHolder)
+        if (holder is AddGroupButtonViewHolder)
             holder.bind(onButtonClick)
         else if (holder is GroupViewHolder)
             holder.bind(getItem(position), onGroupClicked)

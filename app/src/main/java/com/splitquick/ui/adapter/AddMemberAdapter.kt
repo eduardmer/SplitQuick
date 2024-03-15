@@ -6,10 +6,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.splitquick.databinding.ViewAddMemberBinding
 import com.splitquick.databinding.ViewAddMemberButtonBinding
-import com.splitquick.databinding.ViewDeleteButtonBinding
+import com.splitquick.databinding.ViewDeleteMemberButtonBinding
 import com.splitquick.domain.model.Member
-import com.splitquick.ui.view_holder.AddMemberViewHolder
-import com.splitquick.ui.view_holder.DeleteMemberViewHolder
+import com.splitquick.ui.view_holder.AddMemberButtonViewHolder
+import com.splitquick.ui.view_holder.DeleteMemberButtonViewHolder
 import com.splitquick.ui.view_holder.MemberViewHolder
 
 class AddMemberAdapter(
@@ -32,18 +32,18 @@ class AddMemberAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when(viewType) {
-            ADD_BUTTON -> AddMemberViewHolder(ViewAddMemberButtonBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-            DELETE_BUTTON -> DeleteMemberViewHolder(ViewDeleteButtonBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+            ADD_BUTTON -> AddMemberButtonViewHolder(ViewAddMemberButtonBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+            DELETE_BUTTON -> DeleteMemberButtonViewHolder(ViewDeleteMemberButtonBinding.inflate(LayoutInflater.from(parent.context), parent, false))
             else -> MemberViewHolder(ViewAddMemberBinding.inflate(LayoutInflater.from(parent.context), parent, false))
         }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         when (holder) {
-            is DeleteMemberViewHolder -> holder.bind(items.size > 2) {
+            is DeleteMemberButtonViewHolder -> holder.bind(items.size > 2) {
                 deleteItem()
             }
-            is AddMemberViewHolder -> holder.bind {
+            is AddMemberButtonViewHolder -> holder.bind {
                 addItem()
             }
             is MemberViewHolder -> holder.bind(items[position])

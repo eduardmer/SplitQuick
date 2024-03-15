@@ -3,7 +3,7 @@ package com.splitquick.ui.view_holder
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.splitquick.databinding.ViewAddMemberButtonBinding
 
-class AddMemberViewHolder(
+class AddMemberButtonViewHolder(
     private val binding: ViewAddMemberButtonBinding
     ) : ViewHolder(binding.root) {
 

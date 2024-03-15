@@ -1,10 +1,10 @@
 package com.splitquick.ui.view_holder
 
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.splitquick.databinding.ViewAddGroupBinding
+import com.splitquick.databinding.ViewAddGroupButtonBinding
 
-class AddGroupViewHolder(
-    private val binding: ViewAddGroupBinding
+class AddGroupButtonViewHolder(
+    private val binding: ViewAddGroupButtonBinding
 ) : ViewHolder(binding.root) {
 
     fun bind(onClick: () -> Unit) {
