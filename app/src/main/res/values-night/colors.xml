@@ -13,6 +13,7 @@
     <color name="red_lighter">#40FF0000</color>
     <color name="surfaceColor">#141218</color>
 
+    <color name="splash_screen_color">#4DA284</color>
     <color name="header_color">#ffffff</color>
     <color name="icon_color">#cbc4d1</color>
 
